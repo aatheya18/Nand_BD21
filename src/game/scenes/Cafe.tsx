@@ -135,6 +135,9 @@ export function Cafe() {
                   onMouseDown={start}
                   onMouseUp={stop}
                   onMouseLeave={stop}
+                  onTouchStart={start}
+                  onTouchEnd={stop}
+                  onTouchCancel={stop}
                   style={{ cursor: beat === 5 && !blown ? "pointer" : "default" }}
                 >
                   <Cake blown={blown} />
@@ -170,7 +173,7 @@ export function Cafe() {
         </AnimatePresence>
         {beat === 5 && !blown && (
           <span className="rounded-[999px] bg-white/80 px-5 py-2 text-[15px] font-semibold soft-shadow">
-            Click and hold the candles
+            Press and hold the candles
           </span>
         )}
       </div>
