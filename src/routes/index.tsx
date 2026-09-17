@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ErrorBoundary } from "@/ErrorBoundary";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
@@ -80,6 +80,9 @@ function CurrentScene() {
 
 function Stage() {
   const { scene, sceneIndex, transition, muted, toggleMute } = useGame();
+  const [scale, setScale] = useState(1);
+  const [isPortrait, setIsPortrait] = useState(false);
+  const [logicalSize, setLogicalSize] = useState({ width: 1280, height: 720 });
 
   useEffect(() => {
     if (muted) stopAudio();
@@ -87,28 +90,78 @@ function Stage() {
     return () => stopAudio();
   }, [muted]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const portrait = vh > vw;
+      setIsPortrait(portrait);
+
+      const aw = portrait ? vh : vw;
+      const ah = portrait ? vw : vh;
+
+      let s = 1;
+      let logicalWidth = aw;
+      let logicalHeight = ah;
+
+      if (aw < 1280) {
+        s = aw / 1280;
+        logicalWidth = 1280;
+        logicalHeight = ah / s;
+      } else if (aw > 1920) {
+        logicalWidth = 1920;
+        logicalHeight = ah;
+      }
+
+      setScale(s);
+      setLogicalSize({ width: logicalWidth, height: logicalHeight });
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <main className="relative h-screen w-full overflow-hidden bg-[#F7F2EC]">
+    <main className="relative h-[100dvh] w-[100dvw] overflow-hidden bg-[#F7F2EC] flex items-center justify-center">
       <SvgGrainDefs />
-      <div className="relative mx-auto h-full w-full max-w-[1920px] min-w-[1280px] overflow-hidden">
-        <div className="absolute inset-0">
-          <CurrentScene />
-        </div>
-
-        <SceneProgressDots />
-        <TransitionOverlay kind={transition} />
-
-        <button
-          type="button"
-          onClick={() => {
-            toggleMute();
-            if (muted) setTimeout(() => pop("chime"), 120);
+      
+      <div 
+        className="relative flex items-center justify-center shrink-0"
+        style={{
+          width: isPortrait ? '100dvh' : '100dvw',
+          height: isPortrait ? '100dvw' : '100dvh',
+          transform: isPortrait ? 'rotate(90deg)' : 'none',
+        }}
+      >
+        <div 
+          className="relative overflow-hidden shrink-0"
+          style={{
+            width: `${logicalSize.width}px`,
+            height: `${logicalSize.height}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
           }}
-          aria-label={muted ? "Unmute" : "Mute"}
-          className="absolute bottom-5 right-6 z-40 rounded-[999px] bg-white/80 px-4 py-2 text-[15px] font-semibold soft-shadow transition hover:scale-105"
         >
-          {muted ? "🔇" : "🔊"}
-        </button>
+          <div className="absolute inset-0">
+            <CurrentScene />
+          </div>
+
+          <SceneProgressDots />
+          <TransitionOverlay kind={transition} />
+
+          <button
+            type="button"
+            onClick={() => {
+              toggleMute();
+              if (muted) setTimeout(() => pop("chime"), 120);
+            }}
+            aria-label={muted ? "Unmute" : "Mute"}
+            className="absolute bottom-5 right-6 z-40 rounded-[999px] bg-white/80 px-4 py-2 text-[15px] font-semibold soft-shadow transition hover:scale-105"
+          >
+            {muted ? "🔇" : "🔊"}
+          </button>
+        </div>
       </div>
     </main>
   );
