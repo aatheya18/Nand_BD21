@@ -25,38 +25,39 @@ export function DressUp() {
             <NandCharacter pose={ready ? "idle" : "toweled"} outfit={outfit} width={280} />
           </motion.div>
         </div>
-        <div className="mt-6">
-          <PillButton tint="mint" disabled={!ready} onClick={() => advance("crossfade-dreamy")}>
-            Confirm
-          </PillButton>
-        </div>
       </div>
 
-      <div className="flex gap-10">
-        {COLUMNS.map((col) => (
-          <div key={col.key} className="flex flex-col items-center gap-4">
-            <span className="font-script text-[30px] opacity-75">{col.title}</span>
-            {col.items.map((item) => {
-              const selected = outfit[col.key] === item.id;
-              return (
-                <motion.button
-                  key={item.id}
-                  onClick={() => setOutfit({ [col.key]: item.id } as Partial<Outfit>)}
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.94 }}
-                  className="flex w-[164px] items-center gap-3 rounded-[24px] bg-white/70 p-3 soft-shadow"
-                  style={{ outline: selected ? "3px solid #E85A8C" : "3px solid transparent" }}
-                >
-                  <span
-                    className="h-10 w-10 shrink-0 rounded-[14px] border border-black/10"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-left text-[15px] font-semibold">{item.label}</span>
-                </motion.button>
-              );
-            })}
-          </div>
-        ))}
+      <div className="flex flex-col items-center gap-12">
+        <div className="flex gap-10">
+          {COLUMNS.map((col) => (
+            <div key={col.key} className="flex flex-col items-center gap-4">
+              <span className="font-script text-[30px] opacity-75">{col.title}</span>
+              {col.items.map((item) => {
+                const selected = outfit[col.key] === item.id;
+                return (
+                  <motion.button
+                    key={item.id}
+                    onClick={() => setOutfit({ [col.key]: item.id } as Partial<Outfit>)}
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.94 }}
+                    className="flex w-[164px] items-center gap-3 rounded-[24px] bg-white/70 p-3 soft-shadow"
+                    style={{ outline: selected ? "3px solid #E85A8C" : "3px solid transparent" }}
+                  >
+                    <span
+                      className="h-10 w-10 shrink-0 rounded-[14px] border border-black/10"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-left text-[15px] font-semibold">{item.label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        
+        <PillButton tint="mint" disabled={!ready} onClick={() => advance("crossfade-dreamy")}>
+          Confirm Outfit ➔
+        </PillButton>
       </div>
     </div>
   );
